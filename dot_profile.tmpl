@@ -17,7 +17,7 @@ fi
 _byobu_sourced=1 . /usr/bin/byobu-launch 2>/dev/null || true
 . "$HOME/.cargo/env"
 
-{{- else if eq .chezmoi.hostname "EdinburghTrader" }}
+{{- else if eq .chezmoi.hostname "EdinburghTrader" -}}
 #This fixes the backspace when telnetting in.
 #if [ "$TERM" != "linux" ]; then
 #        stty erase
