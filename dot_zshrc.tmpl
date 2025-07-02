@@ -346,7 +346,6 @@ export PATH=$(pathmerge --path /opt/bin:/opt/sbin:/usr/local/bin:/home/pi:/snap/
 # Fallback PATH for other hosts
 export PATH=$(pathmerge --path /usr/local/bin:$PATH)
 {{- end }}
-
 if [[ -x "$(command -v chezmoi)" ]]; then
   stamp="/tmp/chezmoi-last-update-${USER}"
   if [[ ! -f "$stamp" || "$(find "$stamp" -mmin +720 2>/dev/null)" ]]; then
