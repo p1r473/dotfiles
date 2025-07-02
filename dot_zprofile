@@ -1,0 +1,232 @@
+#.zprofile
+#Purpose: Similar to .bash_profile or .profile in Bash, it's meant for things that should run once at the start of the login shell.
+#When It Runs: It's read and executed only in login shells. This is typically when you log into your user account on a tty or through SSH, but not when you open a new terminal window in a graphical session (unless that terminal emulator is set to start a login shell).
+#Common Uses: Environment variable exports, running scripts that should execute once per login session.
+
+# From http://tlug.dnho.net/node/239
+# "The following code when added to your .bashrc file will, after logging in via ssh, look for any unattached screen sessions and automatically attach to the first one found. If only attached sessions are found then a list of these will be outputted to std out. Finally, If there are no screen sessions running at all then a new screen session will be created."
+# if [ $SSH_TTY ] && [ ! $WINDOW ]; then
+#   SCREENLIST=`screen -ls | grep 'Attached'`
+#   if [ $? -eq "0" ]; then
+#       # #echo -e "Screen is already running and attached:\n ${SCREENLIST}"
+#   else
+#       type -P byobu && byobu -U -R || screen -U -R
+#   fi
+# fi
+
+initialize_session() {
+    session_name="$1"
+    session_type="$2"
+    window_name="${3:-}"
+    init_command="${4:-}"
+
+    case $session_type in
+        "byobu-screen")
+            if [ -n "$window_name" ] && [ -n "$init_command" ]; then
+                byobu-screen -d -m -S "$session_name" -t "$window_name" bash -c "$init_command" >/dev/null 2>&1
+            else
+                byobu-screen -d -m -S "$session_name" >/dev/null 2>&1
+            fi
+            ;;
+        "byobu-tmux")
+            if [ -n "$window_name" ] && [ -n "$init_command" ]; then
+                byobu-tmux new-session -A -d -s "$session_name" -n "$window_name" "$init_command" >/dev/null 2>&1
+            else
+                byobu-tmux new-session -A -d -s "$session_name" >/dev/null 2>&1
+            fi
+            ;;
+        "screen")
+            if [ -n "$window_name" ] && [ -n "$init_command" ]; then
+                screen -d -m -S "$session_name" -t "$window_name" bash -c "$init_command" >/dev/null 2>&1
+            else
+                screen -d -m -S "$session_name" >/dev/null 2>&1
+            fi
+            ;;
+        "tmux")
+            if [ -n "$window_name" ] && [ -n "$init_command" ]; then
+                tmux new-session -A -d -s "$session_name" -n "$window_name" "$init_command" >/dev/null 2>&1
+            else
+                tmux new-session -A -d -s "$session_name" >/dev/null 2>&1
+            fi
+            ;;
+    esac
+}
+
+
+open_tab() {
+    session_name="$1"
+    session_type="$2"
+    window_name="$3"
+    init_command="$4"
+
+    case $session_type in
+        "byobu-screen")
+            byobu-screen -S "$session_name" -X screen -t "$window_name" bash -c "$init_command" >/dev/null 2>&1
+            ;;
+        "byobu-tmux")
+            byobu-tmux new-window -t "$session_name" -n "$window_name" "$init_command" >/dev/null 2>&1
+            ;;
+        "screen")
+            screen -S "$session_name" -X screen -t "$window_name" bash -c "$init_command" >/dev/null 2>&1
+            ;;
+        "tmux")
+            tmux new-window -t "$session_name" -n "$window_name" "$init_command" >/dev/null 2>&1
+            ;;
+    esac
+}
+
+attach_session() {
+    session_name="$1"
+    session_type="$2"
+    case $session_type in
+        "byobu-screen")
+            byobu-screen -r "$session_name" >/dev/null 2>&1
+            ;;
+        "byobu-tmux")
+            byobu-tmux attach-session -t "$session_name" >/dev/null 2>&1
+            ;;
+        "screen")
+            screen -r "$session_name" >/dev/null 2>&1
+            ;;
+        "tmux")
+            tmux attach -d -t "$session_name" >/dev/null 2>&1
+            ;;
+    esac
+}
+
+reattach_existing_session() {
+    session_name="$1"
+    session_type="$2"
+    case $session_type in
+        "byobu-screen")
+            byobu-screen -r "$session_name">/dev/null 2>&1
+            ;;
+        "byobu-tmux")
+            byobu-tmux attach -t "$session_name" >/dev/null 2>&1
+            ;;
+        "screen")
+            screen -r "$session_name" >/dev/null 2>&1
+            ;;
+        "tmux")
+            tmux attach -t "$session_name" >/dev/null 2>&1
+            ;;
+    esac
+}
+
+attach_existing_session() {
+    session_name="$1"
+    session_type="$2"
+    case $session_type in
+        "byobu-screen")
+            byobu-screen -x -r "$session_name">/dev/null 2>&1
+            ;;
+        "byobu-tmux")
+            byobu-tmux new-session -t "$session_name" >/dev/null 2>&1
+            ;;
+        "screen")
+            screen -x -r "$session_name" >/dev/null 2>&1
+            ;;
+        "tmux")
+            tmux new-session -t "$session_name" >/dev/null 2>&1
+            ;;
+    esac
+}
+
+# Check for terminal multiplexer variables
+if [ -n "$WINDOW" ] || [ -n "$BYOBU_TTY" ] || [ -n "$BYOBU" ]; then
+    #echo ".zlogin Exiting: Either WINDOW or BYOBU_TTY or BYOBU is set, indicating a session is already in a multiplexer."
+    return 0
+fi
+
+if [ -n "$BYOBU_RUN_DIR" ]; then
+    #echo ".zlogin Exiting: Byobu session is already running."
+    return 0
+fi
+
+# Check if the shell is interactive
+if ! [[ $- == *i* ]]; then
+    #echo ".zlogin Exiting: The shell is not interactive."
+    return 0
+fi
+
+# Check if the PS1 variable is set, indicating shell prompt availability
+if [ -z "$PS1" ]; then
+    #echo ".zlogin Exiting: PS1 is not set."
+    return 0
+fi
+
+# Check for SSH environment to determine if script is running in an SSH session
+if [ -z "$SSH_CONNECTION" ]; then
+    #echo ".zlogin Exiting: SSH_CONNECTION is not set."
+    return 0
+fi
+
+if [ -z "$SSH_CLIENT" ]; then
+    #echo ".zlogin Exiting: SSH_CLIENT is not set."
+    return 0
+fi
+
+if [ -z "$SSH_TTY" ]; then
+    #echo ".zlogin Exiting: SSH_TTY is not set."
+    return 0
+fi
+
+if [ -n "$TMUX" ]; then
+    #echo ".zlogin Exiting: TMUX is already running."
+    return 0
+fi
+
+# Check if the output is going to a terminal
+if ! [ -t 1 ]; then
+    #echo "Exiting: Output is not going to a terminal."
+    return 0
+fi
+
+# Detect session backend from file or use defaults
+if [ -f ~/.byobu/backend ]; then
+    BYOBU_BACKEND=$(cut -d= -f2 < ~/.byobu/backend)
+    session_type="byobu-$BYOBU_BACKEND"
+else
+    session_type="byobu-tmux"  # Default to tmux if byobu backend is not set
+fi
+
+my_session_name="$USER"
+
+case $session_type in
+    "byobu-screen"|"screen")
+        screen_sessions=$(screen -list >/dev/null 2>&1 | grep "$my_session_name" | grep -v "No Sockets found")
+        ;;
+    "byobu-tmux"|"tmux")
+        tmux_sessions=$(tmux list-sessions >/dev/null 2>&1 | grep "$my_session_name")
+        ;;
+esac
+
+if [[ ("$session_type" = "byobu-tmux" || "$session_type" = "tmux") && -n "$tmux_sessions" ]] || 
+   [[ ("$session_type" = "byobu-screen" || "$session_type" = "screen") && -n "$screen_sessions" ]]; then
+    attach_existing_session "$my_session_name" "$session_type" >/dev/null 2>&1
+else
+    #initialize_session "$my_session_name" "$session_type" >/dev/null 2>&1
+    initialize_session "$my_session_name" "$session_type" "Blank" "" >/dev/null 2>&1
+    #open_tab "$my_session_name" "$session_type" "Blank" "" >/dev/null 2>&1
+    #open_tab "$my_session_name" "$session_type" "Glances" "glances" >/dev/null 2>&1
+    #open_tab "$my_session_name" "$session_type" "Syslog" "tail -n 5 -f /var/log/syslog" >/dev/null 2>&1
+    attach_session "$my_session_name" "$session_type" >/dev/null 2>&1
+fi
+
+#_byobu_sourced=1 . /usr/bin/byobu-launch 2>/dev/null || true
+
+# Initialize the session with a blank window
+#byobu-screen  -d -m -S "my_session"
+# Initialize the session with the first task instead of creating a blank window
+#byobu-screen -d -m -S "my_session" -t 'Glances' bash -c 'glances'
+#byobu-screen -S "my_session" -X screen -t 'Glances' bash -c 'glances'
+#byobu-screen -S "my_session" -X screen -t 'Syslog' bash -c 'tail -f /var/log/syslog'
+#byobu-screen -r "my_session"
+
+# Initialize the session with a blank window
+#byobu-tmux new-session -d -s "my_session"
+# Initialize the session with the first task instead of creating a blank window
+#byobu-tmux new-session -d -s "my_session" -n 'Glances' 'glances'
+#byobu-tmux new-window -n 'Glances' 'glances'
+#byobu-tmux new-window -n 'Syslog' 'tail -f /var/log/syslog'
+#byobu-tmux attach-session -t "my_session"

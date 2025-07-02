@@ -1,0 +1,6 @@
+#.zshenv
+#Purpose: Meant for setting environment variables and other settings that should be available to all instances of zsh, including those started as non-interactive shells for script execution.
+#When It Runs: It's the first file sourced in both login and non-login, interactive and non-interactive sessions.
+#Common Uses: Setting PATH and other environment variables that need to be available even in scripts.
+#. "$HOME/.cargo/env"
+export LD_LIBRARY_PATH=/usr/local/lib

@@ -1,0 +1,4 @@
+#.zlogout
+#Purpose: Contains commands to run when a login shell exits.
+#When It Runs: Sourced upon logout from a login shell session.
+#Common Uses: Cleanup tasks, logging logout time.

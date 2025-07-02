@@ -1,0 +1,17 @@
+# ~/.profile: executed by Bourne-compatible login shells.
+
+if [ "$BASH" ]; then
+  if [ -f ~/.bashrc ]; then
+    . ~/.bashrc
+  fi
+fi
+
+mesg n || true
+
+# set PATH so it includes /usr/games if it exists
+if [ -d "/usr/games" ] ; then
+    PATH="/usr/games:$PATH"
+fi
+
+_byobu_sourced=1 . /usr/bin/byobu-launch 2>/dev/null || true
+. "$HOME/.cargo/env"
