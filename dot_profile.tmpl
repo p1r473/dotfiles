@@ -1,4 +1,4 @@
-{{ if or (eq $hostname "Harbormaster") (eq $hostname "Monkeebutt") }}
+{{ if or (eq .chezmoi.hostname "Monkeebutt") (eq .chezmoi.hostname "Harbormaster") }}
 # ~/.profile: executed by Bourne-compatible login shells.
 
 if [ "$BASH" ]; then
@@ -17,7 +17,8 @@ fi
 _byobu_sourced=1 . /usr/bin/byobu-launch 2>/dev/null || true
 . "$HOME/.cargo/env"
 
-{{ else if eq $hostname "EdinburghTrader" }}
+{{ else if eq .chezmoi.hostname "EdinburghTrader" }}
+export PATH=$(pathmerge --path /opt/bin:/opt/sbin:/usr/local/bin:/home/pi:/snap/bin:/volume1/@appstore/python313/bin:$(python3 -c 'import site,os; print(os.p>
 #This fixes the backspace when telnetting in.
 #if [ "$TERM" != "linux" ]; then
 #        stty erase
@@ -67,7 +68,5 @@ if [[ -x /usr/local/bin/zsh ]]; then
 fi
 
 {{ else }}
-# Default fallback .profile content
-# (Optional) You can leave this blank or put something generic here
 :
 {{ end }}
