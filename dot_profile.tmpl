@@ -1,4 +1,4 @@
-{{ if or (eq .chezmoi.hostname "Monkeebutt") (eq .chezmoi.hostname "Harbormaster") }}
+{{ if or (eq .chezmoi.hostname "Monkeebutt") (eq .chezmoi.hostname "Harbormaster") -}}
 # ~/.profile: executed by Bourne-compatible login shells.
 
 if [ "$BASH" ]; then
@@ -17,7 +17,7 @@ fi
 _byobu_sourced=1 . /usr/bin/byobu-launch 2>/dev/null || true
 . "$HOME/.cargo/env"
 
-{{ else if eq .chezmoi.hostname "EdinburghTrader" }}
+{{ else if eq .chezmoi.hostname "EdinburghTrader" -}}
 #This fixes the backspace when telnetting in.
 #if [ "$TERM" != "linux" ]; then
 #        stty erase
@@ -66,6 +66,6 @@ if [[ -x /usr/local/bin/zsh ]]; then
   exec /usr/local/bin/zsh
 fi
 
-{{ else }}
+{{ else -}}
 :
-{{ end }}
+{{- end }}
