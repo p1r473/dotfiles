@@ -21,6 +21,11 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
+stamp="/tmp/chezmoi-last-update-${USER}"
+if [[ ! -f "$stamp" || "$(find "$stamp" -mmin +30 2>/dev/null)" ]]; then
+  chezmoi update && touch "$stamp"
+fi
+
 # Path to your oh-my-zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
 
@@ -131,7 +136,6 @@ cd-ls                           # Lists contents automatically after navigating 
 zsh-reentry-hook                # Re-enters working directory if it has been removed and re-created.
 copy-pasta                      # Copy paste
 wrap				# Wrap curent command in SSH
-#zsh-fzf-history-search          # Replaces Ctrl+R with an fzf-driven select which includes date/times.
 zsh-hist-delete-fzf
 zsh-hist                        # Edit your Zsh history
 fast-syntax-highlighting        # Provides faster syntax highlighting for Zsh.
@@ -207,57 +211,6 @@ alias bat='bat --pager="less -R --quit-if-one-screen"'
 #alias bat='bat --paging=never'
 alias ls="eza-wrapper"
 alias grep="grep -i"
-
-helloWorld ()
-{
-  echo "Hello World!";
-}
-
-function helloworld {
-  echo "Hello world!"
-}
-
-# Common path additions
-export PATH="/home/pi:$PATH"
-export PATH="/snap/bin:$PATH"
-export PATH="$PATH:$(python3 -c 'import site,os; print(os.path.join(site.USER_BASE, "bin"))' 2>/dev/null || echo "")"
-
-# Define fallback shell-compatible pathmerge (only if needed)
-pathmerge_legacy() 
-{
-  local IFS=':'
-  local input_path="${1:-$PATH}"
-  local -A seen
-  local out_path=""
-  for p in ${(s/:/)input_path}; do
-    [[ -n "$p" && -z "${seen[$p]}" ]] && out_path+="${p}:"
-    seen[$p]=1
-  done
-  echo "${out_path%:}"
-}
-
-# Declaring functions using the reserved word function
-# Multiline
-#function f1 {
-#        echo Hello I\'m function 1
-#        echo Bye!
-#}
-# One line
-#function f2 { echo Hello I\'m function 2; echo Bye!; }
-# Declaring functions without the function reserved word
-# Multiline
-#f3 () {
-#        echo Hello I\'m function 3
-#        echo Bye!
-#}
-# One line
-#f4 () { echo Hello I\'m function 4; echo Bye!; }
-# Invoking functions
-#f4
-#f3
-#f2
-#f1
-
 #These are zsh options. The first lets you change directory just by keying in the path — there’s no need to enter cd first. The second enables zsh’s ability to suggest correct commands when you mis-key one. This will ask you about items it doesn’t understand and give the four options: n, y, a and e for, respectively, use as typed, accept the suggested correction, abort, or edit the command. If you have AUTO_CD set, zsh will attempt to correct mistakes in paths you type.The third line clears a pre-set option: to report an error whenever zsh resolves a file path that doesn’t exist. You might want this, but many of my scripts check for the presence of paths so I don’t want extra warnings when the script already takes care of that.
 setopt AUTO_CD
 setopt nocorrectall; setopt correct #correct commands and not arguments
@@ -347,9 +300,3 @@ export PATH=$(pathmerge --path /opt/bin:/opt/sbin:/usr/local/bin:/home/pi:/snap/
 export PATH=$(pathmerge --path /usr/local/bin:$PATH)
 {{- end }}
 
-if [[ -x "$(command -v chezmoi)" ]]; then
-  stamp="/tmp/chezmoi-last-update-${USER}"
-  if [[ ! -f "$stamp" || "$(find "$stamp" -mmin +720 2>/dev/null)" ]]; then
-    chezmoi update --quiet && touch "$stamp"
-  fi
-fi
