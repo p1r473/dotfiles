@@ -216,6 +216,18 @@ setopt AUTO_CD
 setopt nocorrectall; setopt correct #correct commands and not arguments
 unsetopt NOMATCH
 
+{{- if eq .chezmoi.hostname "EdinburghTrader" }}
+docker() {
+  if [[ "$1" == "compose" ]]; then
+    shift
+    command docker-compose "$@"
+  else
+    command docker "$@"
+  fi
+}
+{{- end }}
+
+
 HOSTNAME=$(hostname)
 
 alias ssh='/home/pi/custom_ssh'
