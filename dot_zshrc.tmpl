@@ -21,11 +21,6 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
-stamp="/tmp/chezmoi-last-update-${USER}"
-if [[ ! -f "$stamp" || "$(find "$stamp" -mmin +30 2>/dev/null)" ]]; then
-  chezmoi update && touch "$stamp"
-fi
-
 # Path to your oh-my-zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
 
