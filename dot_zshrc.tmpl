@@ -211,16 +211,23 @@ setopt AUTO_CD
 setopt nocorrectall; setopt correct #correct commands and not arguments
 unsetopt NOMATCH
 
-{{- if eq .chezmoi.hostname "EdinburghTrader" }}
 docker() {
-  if [[ "$1" == "compose" ]]; then
+  if [[ "$1" == "status" ]]; then
+    shift
+    if [[ -z "$1" ]]; then
+      echo "Usage: docker status <container-name>"
+      return 1
+    fi
+    command docker inspect "$1" 2>/dev/null | jq '.[0].State.Health // "No healthcheck defined"' || echo "Container '$1' not found"
+  {{- if eq .chezmoi.hostname "EdinburghTrader" }}
+  elif [[ "$1" == "compose" ]]; then
     shift
     command docker-compose "$@"
+  {{- end }}
   else
     command docker "$@"
   fi
 }
-{{- end }}
 
 
 HOSTNAME=$(hostname)
