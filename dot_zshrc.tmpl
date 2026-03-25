@@ -96,7 +96,6 @@ HISTCONTROL=ignoreboth
 export HISTFILE="${ZDOTDIR:-$HOME}/.zsh_history"
 export HISTSIZE=10000
 export SAVEHIST=10000
-
 setopt INC_APPEND_HISTORY   # Append commands to history immediately (instead of at shell exit)
 setopt SHARE_HISTORY        # Share history between all open Zsh sessions
 setopt HIST_IGNORE_DUPS     # Don't record an entry that was just recorded again
@@ -137,7 +136,8 @@ cd-ls                           # Lists contents automatically after navigating 
 zsh-reentry-hook                # Re-enters working directory if it has been removed and re-created.
 copy-pasta                      # Copy paste
 wrap				# Wrap curent command in SSH
-zsh-fzf-history-search          # Search through ZSH history
+#zsh-fzf-history-search         # Search through ZSH history
+zsh-hist-delete-fzf		# Search through and delete ZSH history
 zsh-hist                        # Edit your Zsh history
 fast-syntax-highlighting        # Provides faster syntax highlighting for Zsh.
 )
