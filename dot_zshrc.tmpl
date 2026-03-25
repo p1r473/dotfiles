@@ -92,11 +92,17 @@ ABBR_USER_ABBREVIATIONS_FILE=~/.abbr
 # don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options
 HISTCONTROL=ignoreboth
-
 # for setting history length see HISTSIZE and HISTFILESIZE
 export HISTFILE="${ZDOTDIR:-$HOME}/.zsh_history"
 export HISTSIZE=10000
 export SAVEHIST=10000
+
+setopt INC_APPEND_HISTORY   # Append commands to history immediately (instead of at shell exit)
+setopt SHARE_HISTORY        # Share history between all open Zsh sessions
+setopt HIST_IGNORE_DUPS     # Don't record an entry that was just recorded again
+setopt HIST_SAVE_NO_DUPS    # Don't write duplicate entries in the history file
+setopt HIST_REDUCE_BLANKS   # Remove superfluous blanks before recording entry
+
 # Which plugins would you like to load?
 # Standard plugins can be found in $ZSH/plugins/
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
@@ -234,7 +240,6 @@ HOSTNAME=$(hostname)
 alias ssh='/home/pi/custom_ssh'
 #alias ping='/home/pi/custom_ping'
 
-unsetopt HIST_REDUCE_BLANKS
 alias forget='hist f -1'
 #alias clear_history='echo "" > ~/.zsh_history & exec $SHELL -l'
 # This function will remove any one line you want from your Zsh history, no questions asked:
