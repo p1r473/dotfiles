@@ -139,10 +139,18 @@ copy-pasta                      # Copy paste
 wrap				# Wrap curent command in SSH
 zsh-fzf-history-search          # Search through ZSH history
 zsh-hist                        # Edit your Zsh history
-fast-syntax-highlighting        # Provides faster syntax highlighting for Zsh.
+#fast-syntax-highlighting        # Provides faster syntax highlighting for Zsh.
 )
-
 source $ZSH/oh-my-zsh.sh
+
+#Fix for https://github.com/marlonrichert/zsh-hist/pull/28
+# zsh-hist delays its real line-finish hook setup until precmd.
+# Force it now, before fast-syntax-highlighting can wrap zle-line-finish.
+if (( $+functions[:hist:precmd] )); then
+  :hist:precmd
+fi
+source "${ZSH_CUSTOM:-$ZSH/custom}/plugins/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh"
+
 source ~/.p10k.zsh
 export UPDATE_ZSH_DAYS=14
 
