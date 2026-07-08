@@ -323,7 +323,7 @@ export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
 {{- if eq .chezmoi.hostname "EdinburghTrader" }}
 export PATH=$(pathmerge --path /opt/bin:/opt/sbin:/usr/local/bin:/home/pi:/snap/bin:/volume1/@appstore/python313/bin:$(python3 -c 'import site,os; print(os.path.join(site.USER_BASE, "bin"))' 2>/dev/null || echo ""):$(pathmerge --sort --path "$PATH"))
 {{- else if or (eq .chezmoi.hostname "Monkeebutt") (eq .chezmoi.hostname "Harbormaster") }}
-export PATH=$(pathmerge --path /opt/bin:/opt/sbin:/usr/local/bin:/home/pi:/snap/bin:$(python3 -c 'import site,os; print(os.path.join(site.USER_BASE, "bin"))' 2>/dev/null || echo ""):$(pathmerge --sort --path "$PATH"))
+export PATH=$(pathmerge --path ${HOME}/.cargo/bin:/opt/bin:/opt/sbin:/usr/local/bin:/home/pi:/snap/bin:$(python3 -c 'import site,os; print(os.path.join(site.USER_BASE, "bin"))' 2>/dev/null || echo ""):$(pathmerge --sort --path "$PATH"))
 {{- else }}
 # Fallback PATH for other hosts
 export PATH=$(pathmerge --path /usr/local/bin:$PATH)
