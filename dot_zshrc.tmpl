@@ -283,9 +283,10 @@ ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=6'
 zstyle ':completion:*' completer _expand_alias _complete _ignored
 
 zstyle ':hist:*' load-hooks false
+
 export ZSH_LLM_SUGGESTION_MODEL="qwen3.8-fast:27b"
 export ZSH_LLM_SUGGESTION_NUM_CTX="65536"
-export ZSH_LLM_SUGGESTION_SERVER="BlackPearl:11434"
+export ZSH_LLM_SUGGESTION_DRAFT_NUM_PREDICT="4"
 export OLLAMA_MODELS="/home/pi/ollama-models/"
 
 #unset ZSH_AUTOSUGGEST_USE_ASYNC
