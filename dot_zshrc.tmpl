@@ -258,6 +258,11 @@ wipe() {
     ~/.ollama_system_message
 }
 
+rbt() 
+{
+    sudo systemctl --message="${*:-Planned maintenance}" reboot
+}
+
 HOSTNAME=$(hostname)
 
 alias ssh='/home/pi/custom_ssh'
